@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Havola — Video Scenario: Zero-Config Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #F9FAFB; color: #111827; -webkit-font-smoothing: antialiased; }
+
+  /* NAV */
+  .nav { position: sticky; top: 0; z-index: 100; background: #060608; padding: 14px 48px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .nav-logo { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.85); }
+  .nav-right { display: flex; gap: 24px; align-items: center; }
+  .nav-label { font-size: 11px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.20); }
+  .nav-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(255,255,255,0.50); background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 999px; }
+
+  /* HERO */
+  .hero { background: #060608; padding: 80px 48px 64px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"); }
+  .hero-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero-eyebrow { font-size: 11px; font-weight: 400; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.20); margin-bottom: 20px; }
+  .hero h1 { font-size: 44px; font-weight: 300; line-height: 56px; color: #fff; letter-spacing: -0.02em; margin-bottom: 10px; }
+  .hero h1 em { font-weight: 300; font-style: italic; color: rgba(255,255,255,0.30); }
+  .hero-sub { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.35); line-height: 26px; max-width: 580px; margin-bottom: 36px; }
+  .hero-meta { display: flex; gap: 40px; flex-wrap: wrap; }
+  .meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .meta-label { font-size: 10px; font-weight: 500; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.12); }
+  .meta-value { font-size: 14px; font-weight: 400; color: rgba(255,255,255,0.50); }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 0 48px; }
+
+  /* STORY */
+  .story { padding: 56px 0; border-bottom: 1px solid #E5E7EB; }
+  .section-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #0065F4; margin-bottom: 14px; }
+  .section-title { font-size: 20px; font-weight: 600; letter-spacing: -0.003em; margin-bottom: 14px; }
+  .story p { font-size: 15px; font-weight: 400; color: #6B7280; line-height: 27px; margin-bottom: 14px; max-width: 700px; }
+  .story p strong { color: #111827; font-weight: 600; }
+
+  /* SCENES */
+  .scenes-section { padding: 56px 0; }
+  .scenes-header { margin-bottom: 40px; }
+  .scenes-header p { font-size: 14px; color: #9CA3AF; margin-top: 6px; }
+
+  /* SCENE */
+  .scene { margin-bottom: 32px; border-radius: 10px; overflow: hidden; border: 1px solid #E5E7EB; background: #fff; }
+  .scene.key-scene { border: 2px solid #0065F4; }
+  .scene-top { display: flex; align-items: stretch; }
+  .scene-num { background: #060608; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 600; padding: 14px 18px; display: flex; align-items: center; justify-content: center; min-width: 56px; }
+  .scene.key-scene .scene-num { background: #0065F4; }
+  .scene-bar { flex: 1; padding: 14px 20px; background: #F9FAFB; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .scene-name { font-size: 15px; font-weight: 600; }
+  .scene-tags { display: flex; gap: 8px; align-items: center; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6B7280; background: #F3F4F6; padding: 3px 10px; border-radius: 999px; }
+  .tag.tag-screen { background: #EFF6FF; color: #1D4ED8; }
+  .tag.tag-text { background: #F3F4F6; color: #6B7280; }
+  .tag.tag-brand { background: #060608; color: rgba(255,255,255,0.60); }
+  .scene-content { padding: 20px; }
+
+  /* Scene blocks */
+  .block { margin-bottom: 18px; }
+  .block:last-child { margin-bottom: 0; }
+  .block-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9CA3AF; margin-bottom: 8px; }
+  .block-text { font-size: 14px; color: #374151; line-height: 24px; }
+  .block-text em { color: #6B7280; font-style: italic; }
+  .block-text strong { color: #111827; font-weight: 600; }
+
+  /* VO inline */
+  .vo-inline { background: #060608; border-radius: 6px; padding: 14px 18px; margin-top: 8px; font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 24px; font-style: italic; }
+
+  /* Key scene callout */
+  .key-callout { background: #EFF6FF; border-radius: 6px; padding: 14px 18px; margin-top: 10px; font-size: 13px; color: #1D4ED8; line-height: 22px; border-left: 3px solid #0065F4; }
+
+  /* Screen preview (dark) */
+  .screen-mock { background: #060608; border-radius: 8px; padding: 28px 24px; margin-top: 8px; text-align: center; }
+  .screen-mock .l1 { font-size: 26px; font-weight: 300; color: #fff; line-height: 36px; }
+  .screen-mock .l2 { font-size: 26px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.30); line-height: 36px; margin-top: 4px; }
+  .screen-mock .shift { font-size: 22px; font-weight: 300; color: #fff; line-height: 32px; }
+  .screen-mock .loop { font-size: 22px; font-weight: 300; color: #fff; }
+  .screen-mock .loop-sub { font-size: 14px; font-weight: 300; font-style: italic; color: rgba(255,255,255,0.20); margin-top: 14px; }
+  .screen-mock .cta-mark { font-size: 16px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 18px; }
+  .screen-mock .cta-tag { font-size: 20px; font-weight: 300; color: #fff; }
+  .screen-mock .cta-url { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.40); margin-top: 12px; }
+  .screen-mock .divider { width: 36px; height: 1px; background: rgba(255,255,255,0.08); margin: 14px auto; }
+
+  /* VO section */
+  .vo-section { padding: 56px 0; border-top: 1px solid #E5E7EB; }
+  .vo-block { background: #060608; border-radius: 10px; padding: 36px; font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.60); line-height: 30px; white-space: pre-line; margin-top: 20px; }
+  .vo-block .gap { display: block; height: 16px; }
+
+  /* Summary table */
+  .summary { padding: 56px 0; border-top: 1px solid #E5E7EB; }
+  .sum-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 20px; }
+  .sum-table th { text-align: left; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #9CA3AF; padding: 10px 14px; border-bottom: 2px solid #E5E7EB; }
+  .sum-table td { padding: 10px 14px; border-bottom: 1px solid #F3F4F6; color: #374151; vertical-align: top; }
+  .sum-table .mono { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #6B7280; }
+  .sum-table .type-tag { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
+  .type-screen { background: #EFF6FF; color: #1D4ED8; }
+  .type-text { background: #F3F4F6; color: #6B7280; }
+  .type-brand { background: #060608; color: rgba(255,255,255,0.60); }
+  .type-overlay { background: #F0FDF4; color: #166534; }
+
+  /* Why */
+  .why { padding: 56px 0; border-top: 1px solid #E5E7EB; }
+  .why p { font-size: 15px; color: #6B7280; line-height: 27px; margin-bottom: 14px; max-width: 700px; }
+  .why p strong { color: #111827; font-weight: 600; }
+
+  /* Footer */
+  .footer { background: #060608; padding: 28px 48px; text-align: center; margin-top: 40px; }
+  .footer p { font-size: 11px; color: rgba(255,255,255,0.15); }
+
+  @media (max-width: 768px) {
+    .hero { padding: 56px 24px 48px; }
+    .hero h1 { font-size: 30px; line-height: 40px; }
+    .container { padding: 0 24px; }
+    .scene-top { flex-direction: column; }
+    .scene-num { padding: 10px 18px; min-width: auto; justify-content: flex-start; }
+    .hero-meta { gap: 24px; }
+    .nav { padding: 14px 24px; }
+    .sum-table { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-logo">Havola</div>
+  <div class="nav-right">
+    <div class="nav-label">Video Scenario</div>
+    <div class="nav-badge">Internal</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Short-Form Video · Campaign Analytics</div>
+    <h1>You built the page.<br><em>The dashboard was already there.</em></h1>
+    <p class="hero-sub">The advantage no competitor can claim: Havola owns both the campaign asset and the analytics layer. This video shows that loop in real time.</p>
+    <div class="hero-meta">
+      <div class="meta-item"><div class="meta-label">Duration</div><div class="meta-value">48 seconds</div></div>
+      <div class="meta-item"><div class="meta-label">Aspect</div><div class="meta-value">9:16 vertical</div></div>
+      <div class="meta-item"><div class="meta-label">Platforms</div><div class="meta-value">Reels · Shorts · TikTok · Threads · LinkedIn</div></div>
+      <div class="meta-item"><div class="meta-label">Product on screen</div><div class="meta-value">63% of runtime</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- STORY -->
+  <div class="story">
+    <div class="section-eyebrow">The Story</div>
+    <div class="section-title">Why this video exists</div>
+    <p>Every agency knows the gap. You build a campaign page, then you spend the next hour setting up tracking so you can actually measure it. Tag Manager snippets. UTM strings. Event configurations. Then you refresh Google Analytics and pray the data shows up.</p>
+    <p>Havola eliminates that gap entirely. When you build a campaign asset on Havola — a site, a link, a QR code — the analytics are already running. There's nothing to configure. <strong>The platform built the asset AND the tracking layer, so the data flows from the first visit.</strong></p>
+    <p>The video shows this loop in real time: <strong>build → publish → live data → drill down → client report.</strong> The product is on screen for 70% of the video because the product is the proof.</p>
+  </div>
+
+  <!-- SCENES -->
+  <div class="scenes-section">
+    <div class="scenes-header">
+      <div class="section-title">Scenes</div>
+      <p>9 scenes. 3 text frames. 6 screen recordings. Product does the talking.</p>
+    </div>
+
+    <!-- 1 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">1</div>
+        <div class="scene-bar">
+          <div class="scene-name">Hook</div>
+          <div class="scene-tags"><div class="tag tag-text">Text</div><div class="tag">0:00–0:03</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="screen-mock">
+            <div class="l1">You built the page.</div>
+            <div class="l2">The dashboard was already there.</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">The only pure text frame that needs to stop the scroll. One claim that sounds impossible — dashboards don't build themselves. The viewer stays to see if it's true. Text is already on screen when the frame appears — no animation, no fade-in. Forces immediate reading.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"You built the page. The dashboard was already there."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">2</div>
+        <div class="scene-bar">
+          <div class="scene-name">The painful workflow everyone recognises</div>
+          <div class="scene-tags"><div class="tag tag-screen">Screen recording</div><div class="tag">0:03–0:10</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="block-text">This is NOT text cards. This is rapid screen recordings of the actual tools agencies use after building a campaign page — the configuration tax they pay before getting any data. Fast cuts, 1.5–2 seconds each:</div>
+          <div class="block-text" style="margin-top: 12px;">
+            <strong>Cut 1:</strong> A Google Tag Manager interface — the container dashboard with tags, triggers, variables. Dense, technical, intimidating. A new tag being created.<br><br>
+            <strong>Cut 2:</strong> A UTM builder tool — someone filling in source, medium, campaign, content fields. Tedious, repetitive.<br><br>
+            <strong>Cut 3:</strong> A Google Analytics 4 real-time view — the screen showing 0 active users. The cursor refreshes the page. Still 0. The worst feeling.
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">Every agency person has stared at these screens hundreds of times. <em>No explanation needed — the recognition is instant.</em> The cuts are fast and slightly uncomfortable. The pace says "this is a chore."</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Build the page. Set up Tag Manager. Configure UTMs. Check if the data's flowing. Refresh. Refresh again."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">3</div>
+        <div class="scene-bar">
+          <div class="scene-name">The shift</div>
+          <div class="scene-tags"><div class="tag tag-text">Text</div><div class="tag">0:10–0:13</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="screen-mock">
+            <div class="shift">What if you never had to<br>do any of that?</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">One brief text frame. The pivot between the old way and the Havola way. Holds just long enough to read, then cuts directly into the product. Doesn't say "we're better" — asks a question the viewer can't dismiss.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"What if you never had to do any of that?"</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">4</div>
+        <div class="scene-bar">
+          <div class="scene-name">Building the campaign page on Havola</div>
+          <div class="scene-tags"><div class="tag tag-screen">Screen recording</div><div class="tag">0:13–0:20</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="block-text">The product takes over the screen. We're inside Havola's Campaign Sites builder. The page is nearly complete — a hero section with the client's branding, a feature grid, a CTA button. Looks professional and finished.</div>
+          <div class="block-text" style="margin-top: 10px;">The cursor drags one final content section into place. Adjusts the heading text. Then moves to the top-right corner and clicks <strong>Publish</strong>. A confirmation appears — the site is live. The URL shows: <strong>hav.la/summer-sale-2026</strong>.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">The energy is the opposite of Scene 2. This is smooth, fast, satisfying. One drag. One click. Live. <em>The publish click is the pivot moment — everything that follows is automatic.</em></div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Build your campaign page on Havola. Drag the sections. Hit publish. You're live."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5 — KEY SCENE -->
+    <div class="scene key-scene">
+      <div class="scene-top">
+        <div class="scene-num">5</div>
+        <div class="scene-bar" style="background:#EFF6FF;">
+          <div class="scene-name">The data is already there</div>
+          <div class="scene-tags"><div class="tag tag-screen">Screen recording</div><div class="tag">0:20–0:26</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="block-text">Immediately after the publish confirmation — <strong>hard cut, no transition, no black frame</strong> — we're looking at the Campaign Analytics dashboard. The same campaign. Data already populating.</div>
+          <div class="block-text" style="margin-top: 10px;">KPI cards across the top show real numbers: visits, unique visitors, form submissions, average session duration. A line chart below shows traffic over the past several days. The data is modest and realistic — not inflated vanity metrics.</div>
+          <div class="block-text" style="margin-top: 10px;">There was no setup step. No Tag Manager. No UTM configuration. No "is the data flowing?" moment. The viewer just watched the page get published, and now they're looking at live analytics.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="key-callout">This is the most important cut in the entire video. The hard cut between publish and live data — with no configuration scene in between — is the visual proof of the competitive advantage. The gap that existed in Scene 2 simply doesn't exist here. The missing scene IS the message. No competitor can make this cut because no competitor owns both layers.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"The moment you publish, your analytics are live. No Tag Manager. No UTMs. Nothing to configure. Havola built the page and the tracking — so the data's already flowing."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">6</div>
+        <div class="scene-bar">
+          <div class="scene-name">Drilling into the data</div>
+          <div class="scene-tags"><div class="tag tag-screen">Screen recording</div><div class="tag">0:26–0:33</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="block-text">The camera zooms into the line chart. The cursor clicks on a data point. The InsightPanel slides open from the right — it shows a summary of the metric with context. Then the cursor clicks deeper — a device breakdown appears showing desktop, mobile, and tablet percentages with visual bars.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">Proves the analytics aren't shallow. Two clicks, real intelligence. The drill-down panel is visually rich — charts, segments, percentages. It looks like enterprise software, not a startup widget. <em>Don't show all five levels — the VO says "five levels," the visual proves the first two. Leaves the viewer wanting to try it.</em></div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Click any chart. Drill down five levels deep. From the number, to the device, to the page, to the trend, to the recommendation."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">7</div>
+        <div class="scene-bar">
+          <div class="scene-name">Comparison and client report</div>
+          <div class="scene-tags"><div class="tag tag-screen">Screen recording</div><div class="tag">0:33–0:40</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="block-text">The camera pulls back to the full dashboard. The cursor toggles the <strong>Compare</strong> switch on. Instantly, the line chart shows a dotted overlay of the previous period. The KPI cards update with coloured deltas — green for up, red for down. Some metrics improved, some didn't. It looks honest and real.</div>
+          <div class="block-text" style="margin-top: 10px;">Then the cursor clicks the export button on one of the modules. The export modal opens. PDF is selected. A thumbnail preview of the insights report is visible — a formatted, multi-section document. The cursor clicks export. Done.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">Two features, 7 seconds. Compare answers "what changed?" Export answers "how do I share this with my client?" Both are one-click actions. <em>Deltas should be a mix of green and red — realistic, not all positive. The report thumbnail should look real but not be readable.</em></div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Compare any period with one toggle. See what went up and what went down. Then export a full insights report for your client — ready in seconds."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">8</div>
+        <div class="scene-bar">
+          <div class="scene-name">The loop</div>
+          <div class="scene-tags"><div class="tag" style="background:#F0FDF4; color:#166534;">Text over product</div><div class="tag">0:40–0:44</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="screen-mock">
+            <div class="loop">Build&ensp;→&ensp;Track&ensp;→&ensp;Understand</div>
+            <div class="loop-sub">No configuration step.</div>
+          </div>
+          <div class="block-text" style="margin-top: 10px;">A semi-transparent dark overlay fades over the dashboard (still visible underneath, slightly blurred). The three words appear in sequence, then the italic subline. The product is still visible behind the text — a subtle reminder that everything the viewer just watched was real, inside one platform.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">Distils the entire video into three words and one truth. <em>This is the frame that lives in the viewer's memory.</em></div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Build. Track. Understand. No configuration step."</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="scene">
+      <div class="scene-top">
+        <div class="scene-num">9</div>
+        <div class="scene-bar">
+          <div class="scene-name">CTA</div>
+          <div class="scene-tags"><div class="tag tag-brand">Brand close</div><div class="tag">0:44–0:48</div></div>
+        </div>
+      </div>
+      <div class="scene-content">
+        <div class="block">
+          <div class="block-label">What the viewer sees</div>
+          <div class="screen-mock">
+            <div class="cta-mark">Havola</div>
+            <div class="cta-tag">Campaign intelligence, unified.</div>
+            <div class="divider"></div>
+            <div class="cta-url">havola.co.uk</div>
+          </div>
+        </div>
+        <div class="block">
+          <div class="block-label">Context</div>
+          <div class="block-text">Clean close. No hard sell. Wordmark fades in, then tagline, then URL. Music swells slightly. Hold for two seconds. End.</div>
+        </div>
+        <div class="block">
+          <div class="block-label">Voiceover</div>
+          <div class="vo-inline">"Havola. Campaign intelligence, unified."</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- VOICEOVER -->
+  <div class="vo-section">
+    <div class="section-eyebrow">Voiceover</div>
+    <div class="section-title">Full script</div>
+    <p style="font-size:14px; color:#9CA3AF; margin-top:4px;">~115 words · 145 wpm · Calm, analytical, confident. Senior colleague — not salesperson.</p>
+    <div class="vo-block">You built the page. The dashboard was already there.
+<span class="gap"></span>Build the page. Set up Tag Manager. Configure UTMs.
+Check if the data's flowing. Refresh. Refresh again.
+<span class="gap"></span>What if you never had to do any of that?
+<span class="gap"></span>Build your campaign page on Havola.
+Drag the sections. Hit publish. You're live.
+<span class="gap"></span>The moment you publish, your analytics are live.
+No Tag Manager. No UTMs. Nothing to configure.
+Havola built the page and the tracking —
+so the data's already flowing.
+<span class="gap"></span>Click any chart. Drill down five levels deep.
+From the number, to the device, to the page,
+to the trend, to the recommendation.
+<span class="gap"></span>Compare any period with one toggle.
+See what went up and what went down.
+Then export a full insights report for your client —
+ready in seconds.
+<span class="gap"></span>Build. Track. Understand. No configuration step.
+<span class="gap"></span>Havola. Campaign intelligence, unified.</div>
+  </div>
+
+  <!-- SUMMARY TABLE -->
+  <div class="summary">
+    <div class="section-eyebrow">Overview</div>
+    <div class="section-title">Scene summary</div>
+    <table class="sum-table">
+      <thead>
+        <tr><th>#</th><th>Time</th><th>Type</th><th>What's on screen</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="mono">0:00–0:03</td><td><span class="sum-table type-tag type-text">Text</span></td><td>Hook line on dark background</td></tr>
+        <tr><td>2</td><td class="mono">0:03–0:10</td><td><span class="sum-table type-tag type-screen">Screen rec</span></td><td>Tag Manager, UTM builder, GA4 showing 0 users — fast cuts</td></tr>
+        <tr><td>3</td><td class="mono">0:10–0:13</td><td><span class="sum-table type-tag type-text">Text</span></td><td>"What if you never had to do any of that?"</td></tr>
+        <tr><td>4</td><td class="mono">0:13–0:20</td><td><span class="sum-table type-tag type-screen">Screen rec</span></td><td>Havola Campaign Sites builder → drag section → publish</td></tr>
+        <tr><td>5</td><td class="mono">0:20–0:26</td><td><span class="sum-table type-tag type-screen">Screen rec</span></td><td>Hard cut to Campaign Analytics — data already there</td></tr>
+        <tr><td>6</td><td class="mono">0:26–0:33</td><td><span class="sum-table type-tag type-screen">Screen rec</span></td><td>Click chart → InsightPanel → drill down to device breakdown</td></tr>
+        <tr><td>7</td><td class="mono">0:33–0:40</td><td><span class="sum-table type-tag type-screen">Screen rec</span></td><td>Toggle compare → deltas appear → export client report</td></tr>
+        <tr><td>8</td><td class="mono">0:40–0:44</td><td><span class="sum-table type-tag type-overlay">Text + product</span></td><td>"Build → Track → Understand" over blurred dashboard</td></tr>
+        <tr><td>9</td><td class="mono">0:44–0:48</td><td><span class="sum-table type-tag type-brand">Brand</span></td><td>Havola wordmark, tagline, URL</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- WHY -->
+  <div class="why">
+    <div class="section-eyebrow">Strategic</div>
+    <div class="section-title">Why this works</div>
+    <p><strong>The competitive advantage isn't explained — it's shown.</strong> The hard cut between Scene 4 (publish) and Scene 5 (live data) is the proof. No competitor can make that cut because no competitor owns both layers.</p>
+    <p><strong>The pain section uses real screens.</strong> Scene 2 shows actual Tag Manager, UTM builder, and GA4 interfaces the viewer recognises instantly. It doesn't describe the pain with text — it shows the actual tools they stare at every week.</p>
+    <p><strong>The product section is one continuous flow.</strong> Build → data → drill down → compare → export. Five capabilities in 27 seconds, all shown as real interactions. The viewer watches someone use the product, not read about it.</p>
+    <p><strong>Product on screen for 63% of the video.</strong> Only 3 out of 9 scenes are text. The product does the talking.</p>
+  </div>
+
+</div>
+
+<div class="footer">
+  <p>Havola · Video Scenario v2 · Campaign Analytics: Zero-Config Intelligence · Internal</p>
+</div>
+
+</body>
+</html>
